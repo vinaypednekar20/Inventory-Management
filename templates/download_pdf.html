@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+	
+</head>
+<body>
+<h2 align="center">Inventory Management</h2>
+<table align="center" class="table table-hover table-dark">
+        <tr>
+          <tr>
+            <th scope="col">Products</th>
+            <th scope="col">Warehouse Locations</th>
+            <th scope="col">Available Quantity</th>
+        </tr>
+        {% for item in details%}
+        	{% if item.available_quantity != 0 %}
+         	<tr>
+            	<td>{{ item.product }}</td>
+            	<td>{{ item.location }}</td>
+            	<td>{{ item.available_quantity }}</td>
+        	</tr>
+    		{% endif %}
+		{% endfor %}
+    </table>
+
+</body>
+</html>

@@ -1,0 +1,237 @@
+<title>Product Movement</title>
+{% extends 'base.html' %}
+
+{% include 'header.html' %}
+
+{%block body%}
+
+<br>
+<div class="container" align="center">
+  <br>
+  <div div class="row-9">
+    <DIV class="jumbotron p-3">
+    <div class="col-12">
+      <H3 align="left">View <b>Movements</b></H3>
+      <div align="right">
+      <button class="btn btn-success btn-xs" data-toggle="modal" data-target="#addNewMovement"><i class="fa fa-plus-circle" aria-hidden="true" style="font-size:18px ; color: white" ></i>  Movement</button>
+    
+    </div>
+    <br>
+    {% with messages =  get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                  {% for category, message in messages %}
+                      <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+                          {% if category == "danger" or category == "warning" %}
+                          <i class="fa fa-warning" style="font-size:24px"></i>
+                          {% else %}
+                          <i class="fa fa-check-circle" style="font-size:24px",colur:white></i>&nbsp;
+                          {% endif %}
+                          {{ message }}
+                           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                          </button>
+                      </div>
+                  {% endfor %}
+              {% endif %}
+            {% endwith %}
+      
+      <table class="table table-striped table-dark">
+        <tr>
+          <th><b>ID</b></th>
+          <th><b>Product</b></th>
+          <th><b>From</b></th>
+          <th><b>To</b></th>
+          <th><b>Quantity</b></th>
+          <th><b>Date</b></th>
+          <th><b>Action</b></th>
+        </tr>
+        {% if message is none%}
+        {% for movement in movements%}
+        <tr>
+          <td>{{movement.id}}</td>
+          <td>{{movement.product_name}}</td>
+          <td>{{movement.from_location}}</td>
+          <td>{{movement.to_location}}</td>
+          <td>{{movement.product_qty}}</td>
+          <td>{{movement.date_updated.strftime('%d-%m-%Y, %H:%M:%S')}}</td>
+          <td>
+            <div style="width:70px;">
+              <div style="float: left; width: 13px"> 
+            <button  style="border: 0; background: none;"  data-toggle="modal" data-target="#editMovement{{movement.id}}" ><i class="fa fa-edit" style="font-size:24px ; color: white"></i></button>
+          </div>
+           <div style="float: right; width: 25px"> 
+            <form action="/movement" method="POST" >
+              <input type="hidden" name="delete_movement_id" id="delete_movement_id" value="{{movement.id}}">
+              <input type="hidden" name="delete_to_location" id="delete_to_location" value="{{movement.to_location}}">
+              <input type="hidden" name="delete_product_name" id="delete_product_name" value="{{movement.product_name}}">
+              {% if movement.from_location == "---" %}
+              
+
+              <button type="submit" name="submit" onclick="this.blur(); return confirm('Are you sure to delete {{movement.product_name}} from {{movement.to_location}} movement ?');" style="border: 0; background: none;">
+            <i class="fa fa-trash-o" style='font-size:24px ; color: white' aria-hidden="true"></i>
+          </button>
+              {% elif movement.to_location == "---" %}
+
+              
+
+              <button type="submit" name="submit" onclick="this.blur();return confirm('Are you sure to delete {{movement.product_name}} from {{movement.from_location}} movement ?');" style="border: 0; background: none;">
+            <i class="fa fa-trash-o" style='font-size:24px ; color: white' aria-hidden="true"></i>
+          </button>
+              {% else%}
+              
+              <button type="submit" name="submit" onclick="this.blur(); return confirm('Are you sure to delete {{movement.product_name}} from {{movement.from_location}} to {{movement.to_location}} movement ?');" style="border: 0; background: none ;">
+            <i class="fa fa-trash-o" style='font-size:24px ; color: white' aria-hidden="true"></i>
+          </button>
+            {% endif %}
+            </form>
+            
+          </div>
+        </div>
+          <!-- Edit Product Modal -->
+
+             <div class="modal" id="editMovement{{movement.id}}">
+                            <form action="/movement" method="POST">
+
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title font-weight-bold" style="color: BLACK">Edit Route</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <div class="modal-body bg-light">
+          <div class="form-group">
+            <label class="font-weight-bold" for="product_name1" style="color: BLACK">Product:</label>
+            <input type="hidden" name="edit_movement" value="{{ movement.id }}">
+              <select class="form-control" id="product_name" name="product_name">
+                 <option style="color: BLACK" value="{{ movement.product_name }}" name="{{ movement.product_name }}" id="{{ movement.product_name }}" selected> {{ movement.product_name }}
+                </option>
+               
+               </select>
+
+              <label class="font-weight-bold" for="from_location1" style="color: BLACK">From:</label>
+              <select class="form-control"  id="from_location" name="from_location">
+    
+
+                <option  value="{{ movement.from_location }}"
+                                                        id="{{ movement.from_location }}" selected> 
+                                                        {{ movement.from_location }}
+                </option>
+                                            
+              </select>
+
+              <label class="font-weight-bold" for="to_location1" style="color: BLACK">To:</label>
+              <select class="form-control"  id="to_location" name="to_location">
+                <option  value="{{ movement.to_location }}" id="{{ movement.to_location }}" selected>
+                 {{ movement.to_location }}
+                </option>
+                                                
+              </select>
+
+              <label class="font-weight-bold" style="color: BLACK">Product Quantity</label>
+            <input type="number" class="form-control" name="product_qty" 
+            id="product_qty" required autocomplete="off" value="{{movement.product_qty}}">
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
+          </button>
+          <input type="submit" class="btn btn-success" value="Save">
+
+
+        </div>
+        
+      </div>
+    </div>
+    
+  </form>
+
+              </div>
+          </td>
+        </tr>
+  
+        {% endfor %}
+        {% else %}
+
+          <h3>{{message}}</h3>
+          <br>
+        
+        {% endif %} 
+      </table>
+    
+      
+      
+      </DIV>
+    </div>
+    
+  </div>
+
+        </div>
+        </div>
+
+    <div class="modal" id="addNewMovement">
+          
+    <form action="/movement" method="POST">
+
+    <div class="modal-dialog">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title font-weight-bold">Add Route</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        
+        <div class="modal-body bg-light">
+          <div class="form-group">
+            <label class="font-weight-bold" for="product_name1">Product:</label>
+              <select class="form-control" id="product_name" name="product_name">
+                <option value="Select product" id='0' name="0" selected>Select product</option>
+                 {% for product in products%}
+              <option id="{{product.name}}" name="{{product.name}}" >{{product.name}}
+              </option>
+               {% endfor %}
+              </select>
+
+              <label class="font-weight-bold" for="from_location1">From:</label>
+              <select class="form-control" id="from_location" name="from_location">
+                <option value="Select Location" id="0" name="0" selected>Select Location</option>
+                 {% for location in locations%}
+              <option id="{{location.name}}" name="{{location.name}}">{{location.name}}</option>
+               {% endfor %}
+              </select>
+
+              <label class="font-weight-bold" for="to_location1">To:</label>
+              <select class="form-control" id="to_location" name="to_location">
+              <option value="Select Location" id='0' name="0" selected>Select Location</option>
+                 {% for location in locations%}
+              <option id="{{location.name}}" name="{{location.name}}">{{location.name}}</option>
+               {% endfor %}
+              </select>
+
+              <label class="font-weight-bold">Product Quantity</label>
+            <input type="number" class="form-control" name="add_product_qty" 
+            id="add_product_qty" required autocomplete="off">
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel
+          </button>
+          <input type="submit" class="btn btn-success" value="Save">
+
+
+        </div>
+        
+      </div>
+    </div>
+    
+  </form>
+
+  </div>
+  
+</div>
+
+
+{%endblock%}

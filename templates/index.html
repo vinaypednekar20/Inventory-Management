@@ -1,0 +1,41 @@
+<title>Home</title>
+{% extends 'base.html' %}
+
+{% include 'header.html' %}
+
+{%block body%}
+
+<br>
+<div class="container" align="center">
+  <br>
+  <div div class="row-9">
+    <DIV class="jumbotron p-4">
+    <div class="col-14">
+      <H3 align="center"><b>Inventory Management</b> <a href="/download_pdf" target="_blank">
+          <i class="fa fa-download" style="font-size:36px;border:4;;color: green"></i></a></H3>
+			<br>
+      <table class="table table-striped table-dark">
+        <tr>
+          <tr>
+            <th scope="col">Products</th>
+            <th scope="col">Warehouse Locations</th>
+            <th scope="col">Available Quantity</th>
+        </tr>
+        {% if message is none%}
+        {% for item in details%}
+        	{% if item.available_quantity != 0 %}
+         	<tr>
+            	<td>{{ item.product }}</td>
+            	<td>{{ item.location }}</td>
+            	<td>{{ item.available_quantity }}</td>
+        	</tr>
+    		{% endif %}
+		{% endfor %}
+            {% else %}
+          
+          <h3>{{message}}</h3>
+          <br>
+        
+        {% endif %} 
+    </table>
+{%endblock%}
