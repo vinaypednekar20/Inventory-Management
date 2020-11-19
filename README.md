@@ -62,5 +62,8 @@ Inventory Balance Report :
 Download Report :
 ![DR1](https://user-images.githubusercontent.com/59640897/99672166-0e1bd500-2a99-11eb-9ebe-ecd1ec2f777e.png)
 
-
+Dependencies :
+Flask
+Pdfkit
+Wkhtmltopdf
 
