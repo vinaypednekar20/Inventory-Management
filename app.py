@@ -39,6 +39,8 @@ class ProductMovement(db.Model):
     date_created = db.Column(db.DateTime, default=datetime.utcnow)
     date_updated = db.Column(db.DateTime, default=datetime.utcnow)
     Flag = db.Column(db.String(50),nullable=False)
+    def __repr__(self):
+    	return 'Movement'+str(self.id)
 
 @app.route('/')
 @app.route('/home')
@@ -48,7 +50,7 @@ def home():
 	if not inventory_details:
 			message = "Currently Data is unavailable.Add Now!"
 
-	return render_template('index.html',title='Inventory Management',details=inventory_details,message=message)
+	return render_template('index.html',details=inventory_details,message=message)
 
 
 @app.route('/download_pdf')
@@ -212,7 +214,7 @@ def movement():
 				add_movement.product_id=product_details.id
 				add_movement.product_name=product_details.name
 				
-				check_location = ProductMovement.query.filter_by(product_name=product_name).filter_by(to_location=from_location).count()
+				check_location = ProductMovement.query.filter_by(product_name=product_name).filter_by(to_location=from_location,Flag='A').count()
 				if from_location == 'Select Location':
 					add_movement.from_location="---"
 					add_movement.to_location=to_location
@@ -266,10 +268,7 @@ def movement():
 			to_location = request.form['to_location']
 			product_qty = request.form['product_qty']
 			product_details = Product.query.filter_by(name=product_name).first()
-
-			if product_details is None:					#Product availibilty check
-				flash(f"Product is Not Available/Deleted", "danger")
-				return redirect('/movement')
+			edit_movement = ProductMovement.query.get_or_404(movement_id)
 
 			if from_location == "---":
 				past_sum_qty = get_total(product_name,to_location,movement_id,"past")
@@ -280,7 +279,6 @@ def movement():
 				future_sum_qty = get_total(product_name,from_location,movement_id,"future")
 			else :
 				future_sum_qty = get_total(product_name,to_location,movement_id,"future")
-			edit_movement = ProductMovement.query.get_or_404(movement_id)
 			
 			if from_location == to_location : #from location & to location cant be same.
 				valid = False
@@ -422,10 +420,6 @@ def get_export_data(product, location,movement=None,process=None):
 		exported = ProductMovement.query.filter_by(product_name=product).filter_by(from_location=location).filter_by(Flag='A').all()
 		return exported
 	
-
-
-
-
 
 def get_data(process=None):
 	all_data=[]
